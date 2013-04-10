@@ -66,7 +66,7 @@ double StarFieldModel::perturb()
 	if(randomU() <= 0.05)
 		which = 4;
 	else
-		which = randInt(4);
+		which = randInt(6);
 
 	if(which == 0)
 		logH += perturb1();
@@ -78,6 +78,8 @@ double StarFieldModel::perturb()
 		logH += perturb4();
 	else if(which == 4)
 		logH += perturb5();
+	else if(which == 5)
+		logH += perturb6();
 	calculateLogLikelihood();
 
 	return logH;
