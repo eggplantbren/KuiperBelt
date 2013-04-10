@@ -5,6 +5,7 @@ saveFrames = False # For making movies
 if saveFrames:
 	os.system('rm Frames/*.png')
 
+numImages = 10
 maxNumStars = 200
 numHyperparams = 15	# Number of parameters before catalog begins
 			# maxNumStars, staleness, psf parameters, noise parameters
@@ -24,15 +25,17 @@ xCatalog = np.array([])
 yCatalog = np.array([])
 fCatalog = np.array([])
 
-mock_data_mean = np.zeros(data.shape)
+mock_data_mean = np.zeros((data.shape[0]//numImages, data.shape[1]))
 brightest = fStars.max()
 
 ion()
 hold(False)
 for i in xrange(0, sample.shape[0]):
-	mock = images[i,:].reshape(data.shape[0], data.shape[1])
+	mock = images[i,:].reshape(data.shape[0]//numImages, data.shape[1])
+	data1 = data[0:data.shape[0]//numImages, :]
+
 	subplot(2,2,1)
-	imshow(data)
+	imshow(data1)
 	title('Data')
 	gca().set_xticks([])
 	gca().set_yticks([])
@@ -54,7 +57,7 @@ for i in xrange(0, sample.shape[0]):
 	title('Mock Data ' + str(i+1))
 	subplot(2,2,4)
 	var = sample[i, 5]**2 + sample[i, 6]*(mock - sample[i, 7])
-	imshow((mock - data)/sqrt(var))
+	imshow((mock - data1)/sqrt(var))
 	gca().set_xticks([])
 	gca().set_yticks([])
 	title('Normalized Residuals')
@@ -73,7 +76,7 @@ ioff()
 show()
 
 subplot(1,3,1)
-imshow(data, extent=(-1, 1, -1, 1))
+imshow(data1, extent=(-1, 1, -1, 1))
 title('Data')
 axis([-1, 1, -1, 1])
 gca().set_xticks([-1, 0, 1])
