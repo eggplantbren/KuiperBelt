@@ -50,6 +50,8 @@ class Data
 		const Array& get_image(int i) const { return images[i]; }
 		int get_numImages() const { return numImages; }
 
+		double get_time(int i) const { return times[i]; }
+
 	// Static stuff for single global instance
 	private:
 		static Data instance;
