@@ -239,18 +239,23 @@ template<class HyperType>
 void StarFieldModel<HyperType>::calculateLogLikelihood()
 {
 	logL = 0.;
-
 	double var;
-	for(int i=0; i<Data::get_instance().get_ni(); i++)
-		for(int j=0; j<Data::get_instance().get_nj(); j++)
-		{
-			var = pow(noiseSigma, 2)
-				+ noiseCoeff*(mockImage(i, j) - background);
 
-			logL += -0.5*log(2*M_PI*var)
-				- 0.5*pow(Data::get_instance().get_image(0)(i, j)
-				- mockImage(i, j), 2)/var;
-		}
+	for(int k=0; k<Data::get_instance().get_numImages(); k++)
+	{
+		Array mock = mockImage; // This is going to have the KBO in it too
+
+		for(int i=0; i<Data::get_instance().get_ni(); i++)
+			for(int j=0; j<Data::get_instance().get_nj(); j++)
+			{
+				var = pow(noiseSigma, 2)
+					+ noiseCoeff*(mock(i, j) - background);
+
+				logL += -0.5*log(2*M_PI*var)
+					- 0.5*pow(Data::get_instance().get_image(0)(i, j)
+					- mockImage(i, j), 2)/var;
+			}
+	}
 }
 
 template<class HyperType>

@@ -43,6 +43,9 @@ class StarFieldModel:public DNest3::Model
 		int numStars;
 		std::vector<Star> stars;
 
+		// One KBO
+		double x0, y0; // Initial position
+
 		Array mockImage;
 		int staleness;
 		double logL;

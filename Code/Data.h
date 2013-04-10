@@ -48,7 +48,7 @@ class Data
 
 		// Getter for images
 		const Array& get_image(int i) const { return images[i]; }
-
+		int get_numImages() const { return numImages; }
 
 	// Static stuff for single global instance
 	private:
