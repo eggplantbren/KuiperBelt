@@ -18,6 +18,7 @@
 
 #include "Utils.h"
 #include "RandomNumberGenerator.h"
+#include "StarFieldModel.h"
 #include <cmath>
 
 using namespace DNest3;

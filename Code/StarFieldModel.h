@@ -76,7 +76,5 @@ class StarFieldModel:public DNest3::Model
 		void print(std::ostream& out) const;
 };
 
-#include "StarFieldModelImpl.h"
-
 #endif
 
