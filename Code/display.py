@@ -7,7 +7,7 @@ if saveFrames:
 
 numImages = 10
 maxNumStars = 200
-numHyperparams = 15	# Number of parameters before catalog begins
+numHyperparams = 16	# Number of parameters before catalog begins
 			# maxNumStars, staleness, psf parameters, noise parameters
 			# luminosity function parameters, KBO parameters
 

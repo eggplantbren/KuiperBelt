@@ -53,6 +53,7 @@ void StarFieldModel::fromPrior()
 	xc = Data::get_instance().get_xMin() + Data::get_instance().get_xRange()*randomU();
 	yc = Data::get_instance().get_yMin() + Data::get_instance().get_yRange()*randomU();
 	r = exp(log(0.01) + log(100.)*randomU());
+	f = exp(log(1E-3) + log(1E6)*randomU());
 
 	calculateMockImage();
 	calculateLogLikelihood();
@@ -142,6 +143,12 @@ double StarFieldModel::perturb6()
 	r += log(100.)*pow(10., 1.5 - 6.*randomU())*randn();
 	r = mod(r - log(0.01), log(100.)) + log(0.01);
 	r = exp(r);
+
+	f = log(f);
+	f += log(1E6)*pow(10., 1.5 - 6.*randomU())*randn();
+	f = mod(f - log(1E-3), log(1E6)) + log(1E-3);
+	f = exp(f);
+
 
 	return logH;
 }
@@ -275,6 +282,13 @@ void StarFieldModel::calculateLogLikelihood()
 	{
 		Array mock = mockImage; // This is going to have the KBO in it too
 
+		// Position of the KBO at this time
+		double x = xc + r*cos(2.*M_PI*Data::get_instance().get_time(k));
+		double y = yc + r*sin(2.*M_PI*Data::get_instance().get_time(k));
+
+		Star kbo(x, y, f);
+		kbo.incrementImage(mock, psf);
+
 		for(int i=0; i<Data::get_instance().get_ni(); i++)
 			for(int j=0; j<Data::get_instance().get_nj(); j++)
 			{
@@ -294,7 +308,7 @@ void StarFieldModel::print(std::ostream& out) const
 	out<<numStars<<' '<<staleness<<' ';
 	out<<psf<<' '<<noiseSigma<<' '<<noiseCoeff<<' '<<background<<' ';
 	hyperparameters.print(out); out<<' ';
-	out<<xc<<' '<<yc<<' '<<r<<' ';
+	out<<xc<<' '<<yc<<' '<<r<<' '<<f<<' ';
 
 	// Print x, pad with zeros
 	for(int i=0; i<numStars; i++)

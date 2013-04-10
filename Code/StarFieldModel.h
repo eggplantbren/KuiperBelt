@@ -46,6 +46,7 @@ class StarFieldModel:public DNest3::Model
 		// Center of ellipse (start with a circle!)
 		double xc, yc;
 		double r; // Radius
+		double f; // Flux of KBO
 
 		Array mockImage;
 		int staleness;
