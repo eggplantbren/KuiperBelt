@@ -27,9 +27,8 @@
 #include "Array.h"
 #include "Data.h"
 #include "PSF.h"
-#include "Hyperparameters.h"
+#include "Hyperparameters/BrokenPareto.h"
 
-template<class HyperType>
 class StarFieldModel:public DNest3::Model
 {
 	private:
@@ -39,12 +38,14 @@ class StarFieldModel:public DNest3::Model
 		double noiseSigma, noiseCoeff; // Noise properties
 		double background;
 
-		HyperType hyperparameters;
+		BrokenPareto hyperparameters;
 		int numStars;
 		std::vector<Star> stars;
 
 		// One KBO
-		double x0, y0; // Initial position
+		// Center of ellipse (start with a circle!)
+		double xc, yc;
+		double r; // Radius
 
 		Array mockImage;
 		int staleness;
@@ -57,6 +58,7 @@ class StarFieldModel:public DNest3::Model
 		double perturb3();
 		double perturb4();
 		double perturb5();
+		double perturb6();
 
 	public:
 		StarFieldModel();

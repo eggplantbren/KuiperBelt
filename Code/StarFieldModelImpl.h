@@ -20,11 +20,13 @@
 #include "RandomNumberGenerator.h"
 #include <cmath>
 
-template<class HyperType>
-const int StarFieldModel<HyperType>::maxNumStars = 200;
+using namespace DNest3;
 
-template<class HyperType>
-StarFieldModel<HyperType>::StarFieldModel()
+
+const int StarFieldModel::maxNumStars = 200;
+
+
+StarFieldModel::StarFieldModel()
 :mockImage(Data::get_instance().get_ni(), Data::get_instance().get_nj())
 ,staleness(0)
 {
@@ -32,34 +34,39 @@ StarFieldModel<HyperType>::StarFieldModel()
 		std::cerr<<"WARNING: Data not loaded."<<std::endl;
 }
 
-template<class HyperType>
-void StarFieldModel<HyperType>::fromPrior()
+
+void StarFieldModel::fromPrior()
 {
-	noiseSigma = exp(log(1E-3) + log(1E6)*DNest3::randomU());
-	noiseCoeff = exp(log(1E-3) + log(1E6)*DNest3::randomU());
-	background = -1000. + 2000.*DNest3::randomU();
+	noiseSigma = exp(log(1E-3) + log(1E6)*randomU());
+	noiseCoeff = exp(log(1E-3) + log(1E6)*randomU());
+	background = -1000. + 2000.*randomU();
 
 	psf.fromPrior();
 	hyperparameters.fromPrior();
-	numStars = DNest3::randInt(maxNumStars + 1);
+	numStars = randInt(maxNumStars + 1);
 
 	stars.clear();
 	for(int i=0; i<numStars; i++)
 		stars.push_back(hyperparameters.generateStar());
+
+	xc = Data::get_instance().get_xMin() + Data::get_instance().get_xRange()*randomU();
+	yc = Data::get_instance().get_yMin() + Data::get_instance().get_yRange()*randomU();
+	r = exp(log(0.01) + log(100.)*randomU());
+
 	calculateMockImage();
 	calculateLogLikelihood();
 }
 
-template<class HyperType>
-double StarFieldModel<HyperType>::perturb()
+
+double StarFieldModel::perturb()
 {
 	double logH = 0.;
 	int which;
 
-	if(DNest3::randomU() <= 0.05)
+	if(randomU() <= 0.05)
 		which = 4;
 	else
-		which = DNest3::randInt(4);
+		which = randInt(4);
 
 	if(which == 0)
 		logH += perturb1();
@@ -76,30 +83,30 @@ double StarFieldModel<HyperType>::perturb()
 	return logH;
 }
 
-template<class HyperType>
-double StarFieldModel<HyperType>::perturb4()
+
+double StarFieldModel::perturb4()
 {
 	double logH = 0.;
-	int which = DNest3::randInt(3);
+	int which = randInt(3);
 	if(which == 0)
 	{
 		noiseSigma = log(noiseSigma);
-		noiseSigma += log(1E6)*pow(10., 1.5 - 6.*DNest3::randomU())*DNest3::randn();
-		noiseSigma = DNest3::mod(noiseSigma - log(1E-3), log(1E6)) + log(1E-3);
+		noiseSigma += log(1E6)*pow(10., 1.5 - 6.*randomU())*randn();
+		noiseSigma = mod(noiseSigma - log(1E-3), log(1E6)) + log(1E-3);
 		noiseSigma = exp(noiseSigma);
 	}
 	else if(which == 1)
 	{
 		noiseCoeff = log(noiseCoeff);
-		noiseCoeff += log(1E6)*pow(10., 1.5 - 6.*DNest3::randomU())*DNest3::randn();
-		noiseCoeff = DNest3::mod(noiseCoeff - log(1E-3), log(1E6)) + log(1E-3);
+		noiseCoeff += log(1E6)*pow(10., 1.5 - 6.*randomU())*randn();
+		noiseCoeff = mod(noiseCoeff - log(1E-3), log(1E6)) + log(1E-3);
 		noiseCoeff = exp(noiseCoeff);
 	}
 	else
 	{
 		mockImage.decrement(background);
-		background += 2000.*pow(10., 1.5 - 6.*DNest3::randomU())*DNest3::randn();
-		background = DNest3::mod(background + 1000., 2000.) - 1000.;
+		background += 2000.*pow(10., 1.5 - 6.*randomU())*randn();
+		background = mod(background + 1000., 2000.) - 1000.;
 		mockImage.increment(background);
 		staleness++;
 	}
@@ -107,8 +114,8 @@ double StarFieldModel<HyperType>::perturb4()
 	return logH;
 }
 
-template<class HyperType>
-double StarFieldModel<HyperType>::perturb5()
+
+double StarFieldModel::perturb5()
 {
 	double logH = 0.;
 	logH += psf.perturb();
@@ -116,18 +123,38 @@ double StarFieldModel<HyperType>::perturb5()
 	return logH;
 }
 
-template<class HyperType>
-double StarFieldModel<HyperType>::perturb1()
+
+
+double StarFieldModel::perturb6()
+{
+	double logH = 0.;
+
+	xc += Data::get_instance().get_xRange()*pow(10., 1.5 - 6.*randomU())*randn();
+	xc = mod(xc - Data::get_instance().get_xMin(), Data::get_instance().get_xRange()) + Data::get_instance().get_xMin();
+
+	yc += Data::get_instance().get_yRange()*pow(10., 1.5 - 6.*randomU())*randn();
+	yc = mod(yc - Data::get_instance().get_yMin(), Data::get_instance().get_yRange()) + Data::get_instance().get_yMin();
+
+	r = log(r);
+	r += log(100.)*pow(10., 1.5 - 6.*randomU())*randn();
+	r = mod(r - log(0.01), log(100.)) + log(0.01);
+	r = exp(r);
+
+	return logH;
+}
+
+
+double StarFieldModel::perturb1()
 {
 	double logH = 0.;
 
 	// Make a proposal for the new number of stars
 	int diff = static_cast<int>
-			(round(maxNumStars*pow(10., 1.5 - 6.*DNest3::randomU())*DNest3::randn()));
+			(round(maxNumStars*pow(10., 1.5 - 6.*randomU())*randn()));
 	if(diff == 0)
-		diff = (DNest3::randomU() <= 0.5)?(-1):(1);
+		diff = (randomU() <= 0.5)?(-1):(1);
 	int proposal = numStars + diff;
-	proposal = DNest3::mod(proposal, maxNumStars + 1);
+	proposal = mod(proposal, maxNumStars + 1);
 
 	int actual_diff = proposal - numStars;
 
@@ -146,7 +173,7 @@ double StarFieldModel<HyperType>::perturb1()
 		int which;
 		for(int i=0; i<-actual_diff; i++)
 		{
-			which = DNest3::randInt(numStars);
+			which = randInt(numStars);
 			stars[which].decrementImage(mockImage, psf);
 			stars.erase(stars.begin() + which);
 			numStars--;
@@ -157,11 +184,11 @@ double StarFieldModel<HyperType>::perturb1()
 	return logH;
 }
 
-template<class HyperType>
-double StarFieldModel<HyperType>::perturb2()
+
+double StarFieldModel::perturb2()
 {
 	double logH = 0.;
-	int which = DNest3::randInt(2);
+	int which = randInt(2);
 	if(which == 0)
 	{
 		logH = hyperparameters.perturb1(stars);
@@ -172,22 +199,22 @@ double StarFieldModel<HyperType>::perturb2()
 	return logH;
 }
 
-template<class HyperType>
-double StarFieldModel<HyperType>::perturb3()
+
+double StarFieldModel::perturb3()
 {
 	double logH = 0.;
 
-	double chance = pow(10., 0.5 - 4.*DNest3::randomU());
-	double scale = pow(10., 1.5 - 6.*DNest3::randomU());
+	double chance = pow(10., 0.5 - 4.*randomU());
+	double scale = pow(10., 1.5 - 6.*randomU());
 
-	int which = DNest3::randInt(2);
+	int which = randInt(2);
 
 	if(which == 0)
 	{
 		// Positions
 		for(int i=0; i<numStars; i++)
 		{
-			if(DNest3::randomU() <= chance)
+			if(randomU() <= chance)
 			{
 				if(chance < 1.)
 					stars[i].decrementImage(mockImage, psf);
@@ -204,7 +231,7 @@ double StarFieldModel<HyperType>::perturb3()
 		// Fluxes
 		for(int i=0; i<numStars; i++)
 		{
-			if(DNest3::randomU() <= chance)
+			if(randomU() <= chance)
 			{
 				if(chance < 1.)
 					stars[i].decrementImage(mockImage, psf);
@@ -226,8 +253,8 @@ double StarFieldModel<HyperType>::perturb3()
 	return logH;
 }
 
-template<class HyperType>
-void StarFieldModel<HyperType>::calculateMockImage()
+
+void StarFieldModel::calculateMockImage()
 {
 	mockImage.set(background);
 	for(size_t i=0; i<stars.size(); i++)
@@ -235,8 +262,8 @@ void StarFieldModel<HyperType>::calculateMockImage()
 	staleness = 0;
 }
 
-template<class HyperType>
-void StarFieldModel<HyperType>::calculateLogLikelihood()
+
+void StarFieldModel::calculateLogLikelihood()
 {
 	logL = 0.;
 	double var;
@@ -258,12 +285,13 @@ void StarFieldModel<HyperType>::calculateLogLikelihood()
 	}
 }
 
-template<class HyperType>
-void StarFieldModel<HyperType>::print(std::ostream& out) const
+
+void StarFieldModel::print(std::ostream& out) const
 {
 	out<<numStars<<' '<<staleness<<' ';
 	out<<psf<<' '<<noiseSigma<<' '<<noiseCoeff<<' '<<background<<' ';
 	hyperparameters.print(out); out<<' ';
+	out<<xc<<' '<<yc<<' '<<r<<' ';
 
 	// Print x, pad with zeros
 	for(int i=0; i<numStars; i++)

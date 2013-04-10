@@ -6,9 +6,9 @@ if saveFrames:
 	os.system('rm Frames/*.png')
 
 maxNumStars = 200
-numHyperparams = 12	# Number of parameters before catalog begins
+numHyperparams = 15	# Number of parameters before catalog begins
 			# maxNumStars, staleness, psf parameters, noise parameters
-			# luminosity function parameters
+			# luminosity function parameters, KBO parameters
 
 sample = atleast_2d(loadtxt('posterior_sample.txt'))
 data = loadtxt('SimulatedData/100.txt')
