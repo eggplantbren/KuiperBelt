@@ -12,7 +12,7 @@ numHyperparams = 15	# Number of parameters before catalog begins
 			# luminosity function parameters, KBO parameters
 
 sample = atleast_2d(loadtxt('posterior_sample.txt'))
-data = loadtxt('SimulatedData/100.txt')
+data = loadtxt('SimulatedData/no_kbo.txt')
 
 params =   sample[:, 0:numHyperparams]
 catalogs = sample[:, numHyperparams:numHyperparams+3*maxNumStars]
