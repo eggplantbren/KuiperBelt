@@ -19,8 +19,8 @@ void Data::load(const char* filename)
 	if(!fin)
 		cerr<<"Error: Can't load "<<filename<<"."<<endl;
 	char hash;
-	fin>>hash;
-	fin>>ni>>nj>>xMin>>xMax>>yMin>>yMax;
+	fin>>hash; fin>>numImages; fin.ignore(1000000, '\n');
+	fin>>hash>>ni>>nj>>xMin>>xMax>>yMin>>yMax; fin.ignore(1000000, '\n');
 
 	xRange = xMax - xMin;
 	yRange = yMax - yMin;
@@ -28,11 +28,15 @@ void Data::load(const char* filename)
 	dy = yRange/ni;
 	dA = dx*dy;
 
-	image.resize(ni, nj);
+	images.resize(numImages);
 
-	for(int i=0; i<ni; i++)
-		for(int j=0; j<nj; j++)
-			fin>>image(i, j);
+	for(int k=0; k<numImages; k++)
+	{
+		images[k].resize(ni, nj);
+		for(int i=0; i<ni; i++)
+			for(int j=0; j<nj; j++)
+				fin>>images[k](i, j);
+	}
 	fin.close();
 	loaded = true;
 
@@ -43,8 +47,8 @@ void Data::load(const char* filename)
 		x[j] = xMin + (j + 0.5)*dx;
 	for(int i=0; i<ni; i++)
 		y[i] = yMax - (i + 0.5)*dy;
-	xc = image;
-	yc = image;
+	xc = images[0];
+	yc = images[0];
 	for(int i=0; i<ni; i++)
 	{
 		for(int j=0; j<nj; j++)

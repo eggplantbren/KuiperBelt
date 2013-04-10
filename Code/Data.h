@@ -11,8 +11,10 @@
 class Data
 {
 	private:
-		Array image; // Pixel intensities
 		bool loaded;
+
+		int numImages;
+		std::vector<Array> images; // Pixel intensities
 
 		int ni, nj;
 		double xMin, xMax, yMin, yMax;
@@ -43,8 +45,8 @@ class Data
 		double get_xc(int i, int j) const { return xc(i, j); }
 		double get_yc(int i, int j) const { return yc(i, j); }
 
-		// Getter for pixel values
-		double operator () (int i, int j) const { return image(i, j); }
+		// Getter for images
+		const Array& get_image(int i) const { return images[i]; }
 
 
 	// Static stuff for single global instance

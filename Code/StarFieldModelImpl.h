@@ -248,7 +248,7 @@ void StarFieldModel<HyperType>::calculateLogLikelihood()
 				+ noiseCoeff*(mockImage(i, j) - background);
 
 			logL += -0.5*log(2*M_PI*var)
-				- 0.5*pow(Data::get_instance()(i, j)
+				- 0.5*pow(Data::get_instance().get_image(0)(i, j)
 				- mockImage(i, j), 2)/var;
 		}
 }
