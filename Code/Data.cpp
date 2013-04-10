@@ -19,7 +19,11 @@ void Data::load(const char* filename)
 	if(!fin)
 		cerr<<"Error: Can't load "<<filename<<"."<<endl;
 	char hash;
-	fin>>hash; fin>>numImages; fin.ignore(1000000, '\n');
+	fin>>hash; fin>>numImages;
+	times.resize(numImages);
+	for(int i=0; i<numImages; i++)
+		fin>>times[i];
+	fin.ignore(1000000, '\n');
 	fin>>hash>>ni>>nj>>xMin>>xMax>>yMin>>yMax; fin.ignore(1000000, '\n');
 
 	xRange = xMax - xMin;

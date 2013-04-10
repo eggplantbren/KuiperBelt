@@ -14,6 +14,7 @@ class Data
 		bool loaded;
 
 		int numImages;
+		std::vector<double> times;
 		std::vector<Array> images; // Pixel intensities
 
 		int ni, nj;
