@@ -1,0 +1,11 @@
+*.gch
+*.o
+main
+levels.txt
+sample.txt
+sample_info.txt
+posterior_sample.txt
+weights.txt
+*.pyc
+
+
