@@ -328,8 +328,22 @@ void StarFieldModel::print(std::ostream& out) const
 	for(int i=numStars; i<maxNumStars; i++)
 		out<<0<<' ';
 
-	for(int i=0; i<Data::get_instance().get_ni(); i++)
-		for(int j=0; j<Data::get_instance().get_nj(); j++)
-			out<<mockImage(i, j)<<' ';
+
+	// Print N mock images
+	for(int k=0; k<Data::get_instance().get_numImages(); k++)
+	{
+		Array mock = mockImage; // This is going to have the KBO in it too
+
+		// Position of the KBO at this time
+		double x = xc + r*cos(2.*M_PI*Data::get_instance().get_time(k));
+		double y = yc + r*sin(2.*M_PI*Data::get_instance().get_time(k));
+
+		Star kbo(x, y, f);
+		kbo.incrementImage(mock, psf);
+
+		for(int i=0; i<Data::get_instance().get_ni(); i++)
+			for(int j=0; j<Data::get_instance().get_nj(); j++)
+				out<<mock(i, j)<<' ';
+	}
 }
 

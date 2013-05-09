@@ -31,7 +31,7 @@ brightest = fStars.max()
 ion()
 hold(False)
 for i in xrange(0, sample.shape[0]):
-	mock = images[i,:].reshape(data.shape[0]//numImages, data.shape[1])
+	mock = images[i,0:data.shape[0]*data.shape[1]//numImages].reshape(data.shape[0]//numImages, data.shape[1])
 	data1 = data[0:data.shape[0]//numImages, :]
 
 	subplot(2,2,1)
