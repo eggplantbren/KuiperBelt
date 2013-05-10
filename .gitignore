@@ -7,5 +7,6 @@ sample_info.txt
 posterior_sample.txt
 weights.txt
 *.pyc
-
+KuiperBelt
+logfile
 
