@@ -27,7 +27,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	Data::load_data("SimulatedData/no_kbo.txt");
+	Data::load_data("SimulatedData/kbo.txt");
 	DNest3::start_mt< StarFieldModel >(argc, argv);
 	return 0;
 }
