@@ -28,11 +28,14 @@ fCatalog = np.array([])
 mock_data_mean = np.zeros((data.shape[0]//numImages, data.shape[1]))
 brightest = fStars.max()
 
+epoch = 0
+
 ion()
 hold(False)
 for i in xrange(0, sample.shape[0]):
-	mock = images[i,0:data.shape[0]*data.shape[1]//numImages].reshape(data.shape[0]//numImages, data.shape[1])
-	data1 = data[0:data.shape[0]//numImages, :]
+	mock = images[i, epoch*data.shape[0]*data.shape[1]//numImages:(epoch+1)*data.shape[0]*data.shape[1]//numImages]\
+		.reshape(data.shape[0]//numImages, data.shape[1])
+	data1 = data[epoch*data.shape[0]//numImages:(epoch+1)*data.shape[0]//numImages, :]
 
 	subplot(2,2,1)
 	imshow(data1)
