@@ -330,7 +330,7 @@ void StarFieldModel::print(std::ostream& out) const
 
 
 	// Print N mock images
-	for(int k=0; k<Data::get_instance().get_numImages(); k++)
+	for(int k=0; k<1; k++)
 	{
 		Array mock = mockImage; // This is going to have the KBO in it too
 
