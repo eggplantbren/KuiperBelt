@@ -1,4 +1,4 @@
-OPTIONS = -O2 -Wall -Wextra -pedantic -ansi -DNDEBUG
+OPTIONS = -m64 -Ofast -flto -march=native -funroll-loops -Wall -Wextra -pedantic -ansi -DNDEBUG
 LIBS = -ldnest3 -lgsl -lgslcblas -lboost_thread -lboost_system
 
 default:
